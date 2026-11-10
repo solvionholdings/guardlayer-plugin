@@ -1,0 +1,15 @@
+{
+  "name": "guardlayer",
+  "description": "GuardLayer: security checks for Next.js + Supabase apps",
+  "owner": {
+    "name": "GuardLayer",
+    "url": "https://www.guardlayer.io"
+  },
+  "plugins": [
+    {
+      "name": "guardlayer",
+      "source": "./",
+      "description": "Scan the code, check the live Supabase project read-only, and confirm each fix landed."
+    }
+  ]
+}

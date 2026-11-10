@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "guardlayer": {
+      "type": "http",
+      "url": "https://www.guardlayer.io/api/mcp"
+    }
+  }
+}

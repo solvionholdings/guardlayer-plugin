@@ -1,0 +1,19 @@
+{
+  "name": "guardlayer",
+  "displayName": "GuardLayer",
+  "version": "1.0.0",
+  "description": "Security check for Next.js + Supabase apps: scan the code, check the live Supabase project read-only, and confirm each fix landed.",
+  "author": {
+    "name": "GuardLayer",
+    "url": "https://www.guardlayer.io"
+  },
+  "homepage": "https://www.guardlayer.io/mcp",
+  "repository": "https://github.com/solvionholdings/guardlayer-plugin",
+  "license": "MIT",
+  "keywords": ["security", "supabase", "nextjs", "rls", "vibe-coding", "lovable", "mcp"],
+  "icon": "./icon.png",
+  "documentationUrl": "https://www.guardlayer.io/mcp",
+  "supportUrl": "https://github.com/solvionholdings/guardlayer-plugin/issues",
+  "privacyPolicyUrl": "https://www.guardlayer.io/privacy",
+  "termsOfServiceUrl": "https://www.guardlayer.io/terms"
+}
