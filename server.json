@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.solvionholdings/guardlayer",
   "title": "GuardLayer",
-  "description": "Security check for Next.js + Supabase apps: scan code, check the live database read-only, confirm fixes.",
+  "description": "Security checks for Next.js + Supabase apps: code scan, read-only live DB check, fix confirmation.",
   "version": "1.0.0",
   "websiteUrl": "https://www.guardlayer.io/mcp",
   "repository": {
