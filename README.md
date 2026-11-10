@@ -1,158 +1,51 @@
-# MCP Registry
+# GuardLayer for Claude Code
 
-The MCP registry provides MCP clients with a list of MCP servers, like an app store for MCP servers.
+Security check for Next.js + Supabase apps, run by your AI agent. GuardLayer scans the code, checks the live Supabase project read-only, and after a fix confirms what actually closed.
 
-[**📤 Publish my MCP server**](docs/modelcontextprotocol-io/quickstart.mdx) | [**⚡️ Live API docs**](https://registry.modelcontextprotocol.io/docs) | [**👀 Ecosystem vision**](docs/design/ecosystem-vision.md) | 📖 **[Full documentation](./docs)**
+It catches the holes AI-built apps usually ship with: tables anyone can read, RLS off, policies that only check for a signed-in user (public in practice when anyone can sign up), users who can change their own role or plan, service role keys in frontend code or `NEXT_PUBLIC_` / `VITE_` variables, and API routes, Server Actions and Edge Functions that don't check the caller.
 
-## Development Status
-
-**2025-10-24 update**: The Registry API has entered an **API freeze (v0.1)** 🎉. For the next month or more, the API will remain stable with no breaking changes, allowing integrators to confidently implement support. This freeze applies to v0.1 while development continues on v0. We'll use this period to validate the API in real-world integrations and gather feedback to shape v1 for general availability. Thank you to everyone for your contributions and patience—your involvement has been key to getting us here!
-
-**2025-09-08 update**: The registry has launched in preview 🎉 ([announcement blog post](https://blog.modelcontextprotocol.io/posts/2025-09-08-mcp-registry-preview/)). While the system is now more stable, this is still a preview release and breaking changes or data resets may occur. A general availability (GA) release will follow later. We'd love your feedback in [GitHub discussions](https://github.com/modelcontextprotocol/registry/discussions/new?category=ideas) or in the [#registry-dev Discord](https://discord.com/channels/1358869848138059966/1369487942862504016) ([joining details here](https://modelcontextprotocol.io/community/communication)).
-
-Registry Working Group:
-- **Radoslav (Rado) Dimitrov** (Stacklok) [@rdimitrov](https://github.com/rdimitrov) - WG Lead
-- **Tadas Antanavicius** (PulseMCP) [@tadasant](https://github.com/tadasant)
-- **Bob Dickinson** (TeamSpark) [@BobDickinson](https://github.com/BobDickinson)
-- **Preeti (Pree) Dewani** (Ravenmail) [@pree-dew](https://github.com/pree-dew)
-
-## Contributing
-
-We use multiple channels for collaboration - see [modelcontextprotocol.io/community/communication](https://modelcontextprotocol.io/community/communication).
-
-Often (but not always) ideas flow through this pipeline:
-
-- **[Discord](https://modelcontextprotocol.io/community/communication)** - Real-time community discussions
-- **[Discussions](https://github.com/modelcontextprotocol/registry/discussions)** - Propose and discuss product/technical requirements
-- **[Issues](https://github.com/modelcontextprotocol/registry/issues)** - Track well-scoped technical work  
-- **[Pull Requests](https://github.com/modelcontextprotocol/registry/pulls)** - Contribute work towards issues
-
-### Quick start:
-
-#### Pre-requisites
-
-- **Docker**
-- **Go** - version per the `go` directive in [go.mod](./go.mod); the Go toolchain fetches it for you
-- **ko** - Container image builder for Go ([installation instructions](https://ko.build/install/))
-- **golangci-lint** - version per the `golangci-lint-action` pin in [ci.yml](./.github/workflows/ci.yml), so local lint matches CI
-
-#### Running the server
-
-```bash
-# Start full development environment
-make dev-compose
-```
-
-This starts the registry at [`localhost:8080`](http://localhost:8080) with PostgreSQL. The database uses ephemeral storage and is reset each time you restart the containers, ensuring a clean state for development and testing.
-
-**Note:** The registry uses [ko](https://ko.build) to build container images. The `make dev-compose` command automatically builds the registry image with ko and loads it into your local Docker daemon before starting the services.
-
-By default, the registry seeds from the production API with a filtered subset of servers (to keep startup fast). This ensures your local environment mirrors production behavior and all seed data passes validation. For offline development you can seed from a file without validation with `MCP_REGISTRY_SEED_FROM=data/seed.json MCP_REGISTRY_ENABLE_REGISTRY_VALIDATION=false make dev-compose`.
-
-The setup can be configured with environment variables in [docker-compose.yml](./docker-compose.yml) - see [.env.example](./.env.example) for a reference.
-
-<details>
-<summary>Alternative: Running a pre-built Docker image</summary>
-
-Pre-built Docker images are automatically published to GitHub Container Registry. Note that the image does not bundle PostgreSQL, so you need to run your own and point the registry at it via `MCP_REGISTRY_DATABASE_URL` (see [docker-compose.yml](./docker-compose.yml) for a working example):
-
-```bash
-# Run latest stable release
-docker run -p 8080:8080 ghcr.io/modelcontextprotocol/registry:latest
-
-# Run latest from main branch (continuous deployment)
-docker run -p 8080:8080 ghcr.io/modelcontextprotocol/registry:main
-
-# Run specific release version
-docker run -p 8080:8080 ghcr.io/modelcontextprotocol/registry:v1.0.0
-
-# Run development build from main branch
-docker run -p 8080:8080 ghcr.io/modelcontextprotocol/registry:main-20250906-abc123d
-```
-
-**Available tags:** 
-- **Releases**: `latest`, `v1.0.0`, `v1.1.0`, etc.
-- **Continuous**: `main` (latest main branch build)
-- **Development**: `main-<date>-<sha>` (specific commit builds)
-
-</details>
-
-#### Publishing a server
-
-Publishing an MCP server does **not** happen through a pull request to this repository. Adding a `server.json`, a server directory, or an entry in `data/seed.json` will not publish or list your server, even if the PR is merged. Use the `mcp-publisher` CLI from your server's own project instead.
-
-To publish a server, we've built a simple CLI. You can use it with:
-
-```bash
-# Build the latest CLI
-make publisher
-
-# Use it!
-./bin/mcp-publisher --help
-```
-
-See [the publisher guide](./docs/modelcontextprotocol-io/quickstart.mdx) for more details.
-
-#### Other commands
-
-```bash
-# Run lint, schema validation, and all tests
-# Note: this also runs `make dev-down`, stopping any running dev-compose environment
-make check
-```
-
-There are also a few more helpful commands for development. Run `make help` to learn more, or look in [Makefile](./Makefile).
-
-<!--
-For Claude and other AI tools: Always prefer make targets over custom commands where possible.
--->
-
-## Architecture
-
-### Project Structure
+## Install (Claude Code)
 
 ```
-├── cmd/                     # Application entry points
-│   ├── publisher/           # Server publishing tool
-│   └── registry/            # Registry API server
-├── data/                    # Seed data
-├── deploy/                  # Deployment configuration (Pulumi)
-├── docs/                    # Documentation
-├── internal/                # Private application code
-│   ├── api/                 # HTTP handlers and routing
-│   ├── auth/                # Authentication (GitHub OAuth, JWT, namespace blocking)
-│   ├── config/              # Configuration management
-│   ├── database/            # Data persistence (PostgreSQL)
-│   ├── importer/            # Seed data import
-│   ├── service/             # Business logic
-│   ├── telemetry/           # Metrics and monitoring
-│   └── validators/          # Input validation
-├── pkg/                     # Public packages
-│   ├── api/                 # API types and structures
-│   │   └── v0/              # Version 0 API types
-│   └── model/               # Data models for server.json
-├── scripts/                 # Development and testing scripts
-├── tests/                   # Integration tests
-└── tools/                   # CLI tools and utilities
-    └── validate-*.sh        # Schema validation tools
+claude plugin marketplace add solvionholdings/guardlayer-plugin
+claude plugin install guardlayer@guardlayer
 ```
 
-### Authentication
+The plugin adds the GuardLayer MCP server and a skill that tells Claude when to use it: before a deploy, after changing tables or policies, or when it's about to loosen access to get past a permission error. Then ask: "Check this app for security issues with GuardLayer."
 
-Publishing supports multiple authentication methods:
-- **GitHub OAuth** - For publishing by logging into GitHub
-- **GitHub OIDC** - For publishing from GitHub Actions
-- **DNS verification** - For proving ownership of a domain and its subdomains
-- **HTTP verification** - For proving ownership of a domain
+## Other MCP clients
 
-The registry validates namespace ownership when publishing. E.g. to publish...:
-- `io.github.domdomegg/my-cool-mcp` you must login to GitHub as `domdomegg`, or be in a GitHub Action on domdomegg's repos
-- `me.adamjones/my-cool-mcp` you must prove ownership of `adamjones.me` via DNS or HTTP challenge
+The server is a remote MCP server over Streamable HTTP, no install needed:
 
-## Community Projects
+```
+https://www.guardlayer.io/api/mcp
+```
 
-Check out [community projects](docs/community-projects.md) to explore notable registry-related work created by the community.
+Cursor (`.cursor/mcp.json`):
 
-## More documentation
+```json
+{ "mcpServers": { "guardlayer": { "url": "https://www.guardlayer.io/api/mcp" } } }
+```
 
-See the [documentation](./docs) for more details if your question has not been answered here!
+## Tools
+
+| Tool | What it does |
+| --- | --- |
+| `scan_files` | Static scan of the files your agent sends. Each finding comes with the fix. |
+| `get_supabase_snapshot_sql` | A read-only query for the project's catalog: table and column names, RLS flags, policies, grants, triggers, functions, bucket settings. Never rows. |
+| `check_supabase_snapshot` | Checks the snapshot together with your Auth settings. With `previous_issue_keys` it reports what closed, what's new and what's still open. |
+
+## Privacy
+
+Code and snapshots sent to the server are checked in memory and discarded. Your Supabase access token stays on your machine; Auth settings are reduced to on/off flags and numbers before they are read. See the [privacy policy](https://www.guardlayer.io/privacy).
+
+## Data the plugin sends, and where
+
+| Destination | What is sent | When |
+| --- | --- | --- |
+| GuardLayer MCP server (`https://www.guardlayer.io/api/mcp`, the plugin's declared server) | The source files the agent chooses to scan; the read-only catalog snapshot (table and column names, RLS flags, policies, grants, triggers, function and bucket settings, never rows); the project's Auth settings reduced to on/off flags and numbers | When `scan_files` or `check_supabase_snapshot` runs |
+| Supabase Management API (`https://api.supabase.com`), with the user's own access token | The read-only snapshot query, and a read of the project's Auth settings | Only if the agent uses this route to run the snapshot query. The user can instead run it in the Supabase SQL editor or through the Supabase MCP server |
+
+Nothing is retained by GuardLayer. Supabase's handling of API requests is covered by [Supabase's privacy policy](https://supabase.com/privacy). Usage is counted by tool name only (which tool ran, which client connected), never by content.
+
+More: [guardlayer.io/mcp](https://www.guardlayer.io/mcp) · Browser version: [guardlayer.io/check-supabase](https://www.guardlayer.io/check-supabase)
