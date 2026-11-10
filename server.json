@@ -3,8 +3,12 @@
   "name": "io.github.solvionholdings/guardlayer",
   "title": "GuardLayer",
   "description": "Security checks for Next.js + Supabase apps: code scan, read-only live DB check, fix confirmation.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "websiteUrl": "https://www.guardlayer.io/mcp",
+  "icons": [
+    { "src": "https://www.guardlayer.io/icon.svg", "mimeType": "image/svg+xml", "sizes": ["any"] },
+    { "src": "https://www.guardlayer.io/apple-icon.png", "mimeType": "image/png", "sizes": ["180x180"] }
+  ],
   "repository": {
     "url": "https://github.com/solvionholdings/guardlayer-plugin",
     "source": "github"
