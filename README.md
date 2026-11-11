@@ -1,5 +1,7 @@
 # GuardLayer for Claude Code
 
+[![mcptry](https://mcptry.com/badge/io.github.solvionholdings/guardlayer)](https://mcptry.com/servers/io.github.solvionholdings/guardlayer)
+
 Security check for Next.js + Supabase apps, run by your AI agent. GuardLayer scans the code, checks the live Supabase project read-only, and after a fix confirms what actually closed.
 
 It catches the holes AI-built apps usually ship with: tables anyone can read, RLS off, policies that only check for a signed-in user (public in practice when anyone can sign up), users who can change their own role or plan, service role keys in frontend code or `NEXT_PUBLIC_` / `VITE_` variables, and API routes, Server Actions and Edge Functions that don't check the caller.
